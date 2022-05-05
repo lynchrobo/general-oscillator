@@ -1,10 +1,10 @@
 function pp_spring = springSpline(varargin)
     n = nargin;
     if n == 3
-        [Ksmall, Klarge,dStop] = varargin{:};
+        [K1, K2,dStop] = varargin{:};
         plotFlag = 0;
     elseif n == 4
-        [Ksmall, Klarge,dStop,plotFlag] = varargin{:};
+        [K1, K2,dStop,plotFlag] = varargin{:};
     else
         warning("Wrong number of inputs")
         return
@@ -15,11 +15,11 @@ function pp_spring = springSpline(varargin)
 
     for i = 1:length(x)
         if x(i)>dStop
-            y(i) = Klarge.*x(i)-dStop*(Klarge-Ksmall);
+            y(i) = K2.*x(i)-dStop*(K2-K1);
         elseif x(i)<-dStop
-            y(i) = Klarge.*x(i)+dStop*(Klarge-Ksmall);
+            y(i) = K2.*x(i)+dStop*(K2-K1);
         else
-            y(i) = Ksmall*x(i);
+            y(i) = K1*x(i);
         end
     end
 

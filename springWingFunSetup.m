@@ -29,16 +29,16 @@ switch sim_opts.springMode
     case 'linear'
         K   = sim_opts.params.spring;
         F_e = @(s) K*s(1);
-    case 'mech_stop'
+    case 'piecewise'
         if length(sim_opts.params.spring)<3
-            warning("Mechanical stop requires two parameters")
+            warning("Piecewise spring requires two parameters")
             return
         else
-            Ksmall = sim_opts.params.spring(1);
-            Klarge = sim_opts.params.spring(2);
+            K1 = sim_opts.params.spring(1);
+            K2 = sim_opts.params.spring(2);
             dStop   = sim_opts.params.spring(3);
             
-            spring_spline = springSpline(Ksmall,Klarge,dStop); % add a 1 at the end of the inputs to plot the spline
+            spring_spline = springSpline(K1,K2,dStop,1); % add a 1 at the end of the inputs to plot the spline
             
             F_e     = @(s) ppval(spring_spline,s(1));
 
@@ -59,7 +59,7 @@ end
 
 % force
 switch sim_opts.forceMode
-    case 'sinusoid'
+    case 'par_sine'
         amp     = sim_opts.params.force(1);
         freq    = sim_opts.params.force(2);
         u       = @(t) amp*sin(2*pi*freq*t);
