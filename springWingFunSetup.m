@@ -1,6 +1,7 @@
 function fcnHandle = springWingFunSetup(sim_opts)
 
-% s = [theta,dtheta];
+% Synch Modes:  s = [theta,dtheta/dt];
+% Asynch Modes: s = [theta,dtheta/dt,dSA,d(dSA)/dt]
 
 % inertia
 switch sim_opts.inertiaMode
@@ -38,7 +39,7 @@ switch sim_opts.springMode
             K2 = sim_opts.params.spring(2);
             dStop   = sim_opts.params.spring(3);
             
-            spring_spline = springSpline(K1,K2,dStop,1); % add a 1 at the end of the inputs to plot the spline
+            spring_spline = springSpline(K1,K2,dStop);%,1); % add a 1 at the end of the inputs to plot the spline
             
             F_e     = @(s) ppval(spring_spline,s(1));
 
@@ -60,16 +61,40 @@ end
 % force
 switch sim_opts.forceMode
     case 'par_sine'
-        amp     = sim_opts.params.force(1);
-        freq    = sim_opts.params.force(2);
-        u       = @(t) amp*sin(2*pi*freq*t);
+        amp         = sim_opts.params.force(1);
+        freq        = sim_opts.params.force(2);
+        u           = @(t) amp*sin(2*pi*freq*t);
+        % The function output
+        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)/T - F_d(s) - F_e(s)/T^2)]';
+    
+    case 'ser_sine'
+        amp         = sim_opts.params.force(1);
+        freq        = sim_opts.params.force(2);
+        u           = @(t,s) amp*sin(2*pi*freq*t) - s(1);
+        % The function output
+        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)/T - F_d(s) - F_e(s)/T^2)]';
+        
+    case 'dSA3'  % 3-parameter dSA
+        r3      = sim_opts.params.force(1);
+        kappa   = sim_opts.params.force(2);
+        mu      = sim_opts.params.force(3);
+        
+        % make dSA coefficients
+        a1      = r3*(1-kappa);
+        a2      = r3*(1+kappa);
+        a3      = kappa*r3^2;        
+        u       = @(s) mu*s(3);
+        % The function output
+        fcnHandle = @(t,s) [s(2);... 
+                            (1/I)*(u(s)/T - F_d(s) - F_e(s)/T^2);...
+                            s(4);...
+                            -a1*T*s(2)-a2*s(4)-a3*s(3)];
     otherwise
         warning('Unexpected force mode, please try again')
         return
 end
 
-% The function itself
-fcnHandle = @(t,s) [s(2), (1/I)*(u(t)/T - F_d(s) - F_e(s)/T^2)]';
+
 
 
 end
