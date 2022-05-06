@@ -31,19 +31,19 @@ switch sim_opts.springMode
         K   = sim_opts.params.spring;
         F_e = @(s) K*s(1);
     case 'piecewise'
-        if length(sim_opts.params.spring)<3
-            warning("Piecewise spring requires two parameters")
+        if length(sim_opts.params.spring)<3 || length(sim_opts.params.spring)>4
+            warning("Piecewise spring requires 3 or 4 parameters")
             return
-        else
-            K1 = sim_opts.params.spring(1);
-            K2 = sim_opts.params.spring(2);
-            dStop   = sim_opts.params.spring(3);
-            
-            spring_spline = springSpline(K1,K2,dStop);%,1); % add a 1 at the end of the inputs to plot the spline
-            
-            F_e     = @(s) ppval(spring_spline,s(1));
-
+        elseif length(sim_opts.params.spring)==3
+            [K1,K2,dStop] = matsplit(sim_opts.params.spring);
+        else    
+            [K1,K2,dStop,plotFlag] = matsplit(sim_opts.params.spring);
         end
+        
+        spring_spline = springSpline(K1,K2,dStop,plotFlag);
+        
+        F_e     = @(s) ppval(spring_spline,s(1));
+        
     otherwise
         warning('Unexpected spring mode, please try again')
         return
