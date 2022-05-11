@@ -43,7 +43,11 @@ switch sim_opts.springMode
         spring_spline = springSpline(K1,K2,dStop,plotFlag);
         
         F_e     = @(s) ppval(spring_spline,s(1));
-        
+    case 'pendulum'
+        m_pen       = sim_opts.params.spring(1);
+        r_com       = sim_opts.params.spring(2);
+
+        F_e     = @(s) m_pen*9.81*r_com*sin(s(1));
     otherwise
         warning('Unexpected spring mode, please try again')
         return
