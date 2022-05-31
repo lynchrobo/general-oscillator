@@ -57,6 +57,7 @@ end
 switch sim_opts.transmissionMode
     case 'linear'
         T = sim_opts.params.transmission;
+        L = sim_opts.params.length;
     otherwise
         warning('Unexpected transmission mode, please try again')
         return
@@ -69,14 +70,14 @@ switch sim_opts.forceMode
         freq        = sim_opts.params.force(2);
         u           = @(t) amp*sin(2*pi*freq*t);
         % The function output
-        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)/T - F_d(s) - F_e(s)/T^2)]';
+        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)*L/T - F_d(s) - F_e(s)*L^2/T^2)]';
     
     case 'ser_sine'
         amp         = sim_opts.params.force(1);
         freq        = sim_opts.params.force(2);
         u           = @(t,s) amp*sin(2*pi*freq*t) - s(1);
         % The function output
-        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)/T - F_d(s) - F_e(s)/T^2)]';
+        fcnHandle   = @(t,s) [s(2), (1/I)*(u(t)*L/T - F_d(s) - F_e(s)*L^2/T^2)]';
         
     case 'dSA3'  % 3-parameter dSA
         r3      = sim_opts.params.force(1);
@@ -90,7 +91,7 @@ switch sim_opts.forceMode
         u       = @(s) mu*s(3);
         % The function output
         fcnHandle = @(t,s) [s(2);... 
-                            (1/I)*(u(s)/T - F_d(s) - F_e(s)/T^2);...
+                            (1/I)*(u(s)*L/T - F_d(s) - F_e(s)*L^2/T^2);...
                             s(4);...
                             -a1*T*s(2)-a2*s(4)-a3*s(3)];
     otherwise
