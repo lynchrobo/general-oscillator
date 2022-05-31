@@ -29,6 +29,9 @@ function pp_spring = springSpline(varargin)
         clf
         plot(x,y,'.')
         plot(x,ppval(pp_spring,x))
+        axis([-1.5*dStop 1.5 * dStop -K1*dStop*2 K1*dStop*2])
+        xlabel("Displacement")
+        ylabel("Force (N)")
     end
 
 end
