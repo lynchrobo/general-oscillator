@@ -87,8 +87,9 @@ switch sim_opts.forceMode
         % make dSA coefficients
         a1      = r3*(1-kappa);
         a2      = r3*(1+kappa);
-        a3      = kappa*r3^2;        
+        a3      = kappa*r3^2;
         u       = @(s) mu*s(3);
+
         % The function output
         fcnHandle = @(t,s) [s(2);... 
                             (1/I)*(u(s)*L/T - F_d(s) - F_e(s)*L^2/T^2);...
