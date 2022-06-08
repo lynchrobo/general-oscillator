@@ -57,6 +57,9 @@ ylabel('phase (rad)')
 title("phase adaptation")
 subplot(1,2,2)
 plot(t_vec,abs(y(1,:)-w_sig*t_vec'),'.')
+xlabel('time (s)')
+ylabel('absolute phase estimation error (rad)')
+title("Phase estimation error")
 
 
 rms(y(1,end/2:end)-w_sig*t_vec(end/2:end)')*180/2/pi
